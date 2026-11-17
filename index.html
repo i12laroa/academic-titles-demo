@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Títulos Académicos – Blockchain</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0c1222;
+      --bg-card: #141d30;
+      --bg-card-alt: #1a2740;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --accent-hover: #7dd3fc;
+      --success: #34d399;
+      --danger: #f87171;
+      --warning: #fbbf24;
+      --text-primary: #e2e8f0;
+      --text-muted: #94a3b8;
+      --border: rgba(56, 189, 248, 0.12);
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(56, 189, 248, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(52, 211, 153, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+    .app-header { text-align: center; margin-bottom: 2.5rem; }
+    .app-header h1 { font-family: var(--font-display); font-size: 2.4rem; color: #fff; margin-bottom: 0.35rem; letter-spacing: -0.5px; }
+    .app-header h1 span { color: var(--accent); }
+    .app-header p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+
+    .connection-bar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 1rem 1.5rem; margin-bottom: 2rem; }
+    .btn-connect { background: linear-gradient(135deg, var(--accent), #0ea5e9); color: #fff; border: none; border-radius: 10px; padding: 0.6rem 1.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: box-shadow .2s, transform .15s; white-space: nowrap; font-family: var(--font-body); }
+    .btn-connect:hover { box-shadow: 0 0 20px var(--accent-glow); transform: translateY(-1px); }
+    .btn-connect:disabled { opacity: .5; cursor: default; transform: none; box-shadow: none; }
+    .wallet-info { font-size: 0.82rem; color: var(--success); font-family: monospace; word-break: break-all; }
+    .role-badge { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 6px; border: 1px solid; }
+    .role-owner { color: var(--warning); border-color: var(--warning); background: rgba(251,191,36,.08); }
+    .role-issuer { color: var(--accent); border-color: var(--accent); background: var(--accent-glow); }
+    .role-viewer { color: var(--text-muted); border-color: var(--text-muted); background: rgba(148,163,184,.06); }
+
+    .section-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; margin-bottom: 1.75rem; transition: border-color .25s; }
+    .section-card:hover { border-color: rgba(56, 189, 248, 0.22); }
+    .section-card h2 { font-family: var(--font-display); font-size: 1.35rem; margin-bottom: 1.25rem; color: #fff; display: flex; align-items: center; gap: 0.6rem; }
+    .section-card h2 .icon { font-size: 1.3rem; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-grid .full-width { grid-column: 1 / -1; }
+
+    label { display: block; font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 0.35rem; }
+    input, select { width: 100%; background: var(--bg-card-alt); border: 1px solid var(--border); color: var(--text-primary); border-radius: 10px; padding: 0.65rem 0.9rem; font-size: 0.9rem; font-family: var(--font-body); transition: border-color .2s, box-shadow .2s; outline: none; }
+    input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    input::placeholder { color: rgba(148,163,184,0.45); }
+
+    .btn-action { display: inline-flex; align-items: center; gap: 0.5rem; border: none; border-radius: 10px; padding: 0.65rem 1.5rem; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all .2s; font-family: var(--font-body); margin-top: 0.5rem; }
+    .btn-primary-custom { background: linear-gradient(135deg, var(--accent), #0ea5e9); color: #fff; }
+    .btn-primary-custom:hover:not(:disabled) { box-shadow: 0 0 22px var(--accent-glow); transform: translateY(-1px); }
+    .btn-danger-custom { background: linear-gradient(135deg, var(--danger), #dc2626); color: #fff; }
+    .btn-danger-custom:hover:not(:disabled) { box-shadow: 0 0 22px rgba(248,113,113,.2); transform: translateY(-1px); }
+    .btn-success-custom { background: linear-gradient(135deg, var(--success), #059669); color: #fff; }
+    .btn-success-custom:hover:not(:disabled) { box-shadow: 0 0 22px rgba(52,211,153,.2); transform: translateY(-1px); }
+    .btn-outline-custom { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-outline-custom:hover:not(:disabled) { background: var(--accent-glow); }
+    .btn-action:disabled { opacity: .45; cursor: default; transform: none !important; box-shadow: none !important; }
+
+    .titles-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; }
+    .titles-table thead th { background: var(--bg-card-alt); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.72rem; font-weight: 700; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+    .titles-table thead th:first-child { border-radius: 10px 0 0 0; }
+    .titles-table thead th:last-child { border-radius: 0 10px 0 0; }
+    .titles-table tbody td { padding: 0.7rem 1rem; border-bottom: 1px solid rgba(56, 189, 248, 0.06); vertical-align: middle; }
+    .titles-table tbody tr:hover td { background: rgba(56, 189, 248, 0.03); }
+
+    .badge-valid { display: inline-block; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0.2rem 0.55rem; border-radius: 5px; }
+    .badge-valid.valid { color: var(--success); background: rgba(52,211,153,.1); }
+    .badge-valid.revoked { color: var(--danger); background: rgba(248,113,113,.1); }
+
+    .empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: 0.9rem; }
+
+    .toast-container { position: fixed; top: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
+    .toast-msg { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem 1.2rem; font-size: 0.85rem; color: var(--text-primary); box-shadow: 0 8px 30px rgba(0,0,0,.35); animation: slideIn .3s ease; max-width: 380px; }
+    .toast-msg.success { border-left: 3px solid var(--success); }
+    .toast-msg.error { border-left: 3px solid var(--danger); }
+    .toast-msg.info { border-left: 3px solid var(--accent); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    .spinner-inline { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.2); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .nav-tabs-custom { display: flex; gap: 0.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0; }
+    .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.6rem 1.2rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; font-family: var(--font-body); }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .owner-section { border-color: rgba(251,191,36,.18); }
+    .owner-section h2 { color: var(--warning); }
+
+    .id-mono { font-family: monospace; font-size: 0.78rem; color: var(--text-muted); word-break: break-all; }
+    .addr-mono { font-family: monospace; font-size: 0.8rem; }
+    .contract-info { text-align: center; margin-top: 2rem; font-size: 0.75rem; color: rgba(148,163,184,.4); }
+    .contract-info code { color: rgba(148,163,184,.5); background: rgba(56,189,248,.04); padding: 0.15rem 0.4rem; border-radius: 4px; }
+
+    .seed-progress { width: 100%; margin-top: 0.75rem; display: none; }
+    .seed-bar-bg { background: var(--bg-card-alt); border-radius: 8px; height: 8px; overflow: hidden; }
+    .seed-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 8px; transition: width 0.3s; width: 0%; }
+    .seed-text { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem; }
+
+    /* ── Role-based visibility: hidden by default, shown via JS ── */
+    .issuer-only, .owner-only { display: none; }
+    .issuer-only.visible, .owner-only.visible { display: block; }
+
+    /* ── IPFS dropzone ── */
+    #ipfsDropzone.dragover { border-color: var(--accent); background: var(--accent-glow); }
+    #ipfsDropzone.uploaded { border-color: var(--success); background: rgba(52,211,153,.06); }
+    .ipfs-link { color: var(--accent); text-decoration: none; font-family: monospace; font-size: 0.78rem; }
+    .ipfs-link:hover { text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="page-wrapper">
+
+    <header class="app-header">
+      <h1>Títulos Académicos <span>on-chain</span></h1>
+      <p>Registro, verificación y gestión de títulos académicos en blockchain</p>
+    </header>
+
+    <!-- ═══ CONNECTION BAR ═══ -->
+    <div class="connection-bar">
+      <button id="btn_Conectar" class="btn-connect">🦊 Conectar MetaMask</button>
+      <button id="btn_Seed" class="btn-action btn-success-custom" style="display:none; margin-top:0;">🌱 Cargar 15 títulos de ejemplo</button>
+      <span id="cuentaMonedero" class="wallet-info"></span>
+      <span id="rolBadge"></span>
+      <div class="seed-progress" id="seedProgress">
+        <div class="seed-bar-bg"><div class="seed-bar-fill" id="seedBar"></div></div>
+        <div class="seed-text" id="seedText"></div>
+      </div>
+    </div>
+
+    <!-- ═══ REGISTER TITLE ═══ -->
+    <div class="section-card issuer-only" id="seccionRegistrar">
+      <h2><span class="icon">📜</span> Registrar Título</h2>
+      <div class="form-grid">
+        <div>
+          <label for="regNombre">Nombre</label>
+          <input id="regNombre" type="text" placeholder="Juan">
+        </div>
+        <div>
+          <label for="regApellidos">Apellidos</label>
+          <input id="regApellidos" type="text" placeholder="García López">
+        </div>
+        <div>
+          <label for="regDni">DNI</label>
+          <input id="regDni" type="text" placeholder="12345678A">
+        </div>
+        <div>
+          <label for="regStudent">Dirección del Estudiante</label>
+          <input id="regStudent" type="text" placeholder="0x…">
+        </div>
+        <div>
+          <label for="regDegree">Titulación</label>
+          <input id="regDegree" type="text" placeholder="Grado en Informática">
+        </div>
+        <div>
+          <label for="regInstitution">Institución</label>
+          <input id="regInstitution" type="text" placeholder="Universidad X">
+        </div>
+        <div>
+          <label for="regDate">Fecha</label>
+          <input id="regDate" type="date">
+        </div>
+        <div class="full-width">
+          <label for="regIpfs">IPFS Hash (opcional)</label>
+          <input id="regIpfs" type="text" placeholder="Se rellena automáticamente al subir archivo…" readonly>
+        </div>
+        <div class="full-width">
+          <label>📎 Subir diploma a IPFS (PDF, imagen…)</label>
+          <div id="ipfsDropzone" style="border: 2px dashed var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; cursor: pointer; transition: border-color .2s, background .2s;">
+            <input id="regFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none;">
+            <p id="ipfsDropzoneText" style="color: var(--text-muted); margin: 0; font-size: 0.88rem;">
+              📤 Arrastra un archivo aquí o <span style="color: var(--accent); text-decoration: underline;">haz clic para seleccionar</span>
+            </p>
+            <div id="ipfsUploadProgress" style="display: none; margin-top: 0.75rem;">
+              <div style="background: var(--bg-card-alt); border-radius: 8px; height: 8px; overflow: hidden;">
+                <div id="ipfsProgressBar" style="height: 100%; background: linear-gradient(90deg, var(--accent), var(--success)); border-radius: 8px; transition: width 0.3s; width: 0%;"></div>
+              </div>
+              <p id="ipfsProgressText" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.35rem;"></p>
+            </div>
+          </div>
+          <div id="ipfsConfigPanel" style="margin-top: 0.75rem; padding: 0.75rem; background: var(--bg-card-alt); border-radius: 10px; border: 1px solid var(--border);">
+            <label for="pinataJwt" style="font-size: 0.72rem;">🔑 PINATA JWT TOKEN (<a href="https://app.pinata.cloud/developers/api-keys" target="_blank" style="color: var(--accent);">Obtener gratis en pinata.cloud</a>)</label>
+            <input id="pinataJwt" type="password" placeholder="eyJhbGciOi…" style="font-size: 0.82rem;">
+            <p style="font-size: 0.72rem; color: var(--text-muted); margin: 0.25rem 0 0;">El JWT no se almacena. Solo se usa para subir el archivo a IPFS.</p>
+          </div>
+        </div>
+      </div>
+      <button id="btn_Registrar" class="btn-action btn-primary-custom" disabled>📜 Registrar Título</button>
+    </div>
+
+    <!-- ═══ REVOKE TITLE ═══ -->
+    <div class="section-card issuer-only" id="seccionRevocar">
+      <h2><span class="icon">🚫</span> Revocar Título</h2>
+      <div class="form-grid">
+        <div class="full-width">
+          <label for="revokeId">ID del Título (bytes32)</label>
+          <input id="revokeId" type="text" placeholder="0x…">
+        </div>
+      </div>
+      <button id="btn_Revocar" class="btn-action btn-danger-custom" disabled>🚫 Revocar Título</button>
+    </div>
+
+    <!-- ═══ VERIFY / QUERY ═══ -->
+    <div class="section-card">
+      <h2><span class="icon">🔍</span> Consultar y Verificar</h2>
+      <div class="nav-tabs-custom">
+        <button class="tab-btn active" data-tab="tab-byid">Por ID</button>
+        <button class="tab-btn" data-tab="tab-bystudent">Por Estudiante</button>
+        <button class="tab-btn" data-tab="tab-byname">Por Nombre / Apellidos</button>
+        <button class="tab-btn" data-tab="tab-bydni">Por DNI</button>
+      </div>
+      <div id="tab-byid" class="tab-content active">
+        <div class="form-grid">
+          <div class="full-width">
+            <label for="queryId">ID del Título (bytes32)</label>
+            <input id="queryId" type="text" placeholder="0x…">
+          </div>
+        </div>
+        <button id="btn_ConsultarId" class="btn-action btn-outline-custom" style="margin-top: 0.75rem;">🔎 Consultar</button>
+      </div>
+      <div id="tab-bystudent" class="tab-content">
+        <div class="form-grid">
+          <div class="full-width">
+            <label for="queryStudent">Dirección del Estudiante</label>
+            <input id="queryStudent" type="text" placeholder="0x…">
+          </div>
+        </div>
+        <button id="btn_ConsultarEstudiante" class="btn-action btn-outline-custom" style="margin-top: 0.75rem;">🔎 Consultar Títulos</button>
+      </div>
+      <div id="tab-byname" class="tab-content">
+        <div class="form-grid">
+          <div>
+            <label for="queryNombre">Nombre</label>
+            <input id="queryNombre" type="text" placeholder="Juan">
+          </div>
+          <div>
+            <label for="queryApellidos">Apellidos</label>
+            <input id="queryApellidos" type="text" placeholder="García López">
+          </div>
+        </div>
+        <button id="btn_ConsultarNombre" class="btn-action btn-outline-custom" style="margin-top: 0.75rem;">🔎 Buscar por Nombre</button>
+      </div>
+      <div id="tab-bydni" class="tab-content">
+        <div class="form-grid">
+          <div class="full-width">
+            <label for="queryDni">DNI</label>
+            <input id="queryDni" type="text" placeholder="12345678A">
+          </div>
+        </div>
+        <button id="btn_ConsultarDni" class="btn-action btn-outline-custom" style="margin-top: 0.75rem;">🔎 Buscar por DNI</button>
+      </div>
+      <div id="resultados" style="margin-top: 1.25rem;"></div>
+    </div>
+
+    <!-- ═══ TITLES TABLE ═══ -->
+    <div class="section-card">
+      <h2><span class="icon">📋</span> Títulos Registrados</h2>
+      <div style="overflow-x: auto;">
+        <table class="titles-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Apellidos</th>
+              <th>DNI</th>
+              <th>Estudiante</th>
+              <th>Titulación</th>
+              <th>Institución</th>
+              <th>Fecha</th>
+              <th>IPFS</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tablaTitulos"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state">Aún no se han registrado títulos. Conecta MetaMask y registra el primero.</div>
+      </div>
+    </div>
+
+    <!-- ═══ MANAGE ISSUERS ═══ -->
+    <div class="section-card owner-section owner-only" id="seccionOwner">
+      <h2><span class="icon">⚙️</span> Gestión de Emisores (Owner)</h2>
+      <div class="form-grid">
+        <div>
+          <label for="issuerAddr">Dirección del Emisor</label>
+          <input id="issuerAddr" type="text" placeholder="0x…">
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:.5rem;">
+          <button id="btn_AddIssuer" class="btn-action btn-success-custom" disabled>➕ Añadir</button>
+          <button id="btn_RemoveIssuer" class="btn-action btn-danger-custom" disabled>➖ Eliminar</button>
+        </div>
+      </div>
+      <div style="margin-top:.75rem;">
+        <label for="checkIssuerAddr">Comprobar si es emisor</label>
+        <div style="display:flex; gap:.5rem; align-items:center;">
+          <input id="checkIssuerAddr" type="text" placeholder="0x…" style="max-width:440px;">
+          <button id="btn_CheckIssuer" class="btn-action btn-outline-custom">Comprobar</button>
+        </div>
+        <span id="checkIssuerResult" style="font-size:.82rem; margin-top:.35rem; display:block;"></span>
+      </div>
+    </div>
+
+    <div class="contract-info">
+      Contrato: <code id="contractAddr"></code> · Red Sepolia (testnet de Ethereum)
+    </div>
+
+  </div>
+
+<script src="index.js"></script>
+</body>
+</html>
